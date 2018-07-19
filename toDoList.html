@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    h2{
+        text-align:center;
+    }
+    h3{
+        text-align: center;
+    }
+   .vue{
+       width:400px;
+       margin:0 auto;
+   }
+   [type=text]{
+       margin-left:100px;
+   }
+   li{
+       list-style: none;
+       font-size: 22px;
+       margin-bottom: 2px;
+     
+   }
+   li span{
+    color:hotpink;
+    cursor: pointer;
+    
+   }
+   li span.done{
+       text-decoration: line-through;
+       color:gray;
+   }
+   li a{
+       float:right;
+       border:1px solid #000;
+       display:inline-block;
+       border-radius: 50%;
+       height:29.5px;
+       box-sizing: border-box;
+       line-height: 29.5px;
+       background-color: blue;
+       color:white;
+       cursor: pointer;
+       font-size: 20px;
+   }
+</style>
+
+<body>
+    <h2>待办事项</h2>
+    <div class="vue">
+        <input type="text" v-model="something">
+        <input type="button" v-on:click="handle" value="添加"></input>
+        <h3>总数{{list.length}}--已完成{{hasDone}}</h3>
+        <ul>
+            <li v-for="(item, index) in list">
+                <span v-on:click="doThis(index)" v-bind:class="{done:item.isDone}">{{index+1}}.{{item.name}}</span>
+                <a v-on:click.stop="remove(index)">8</a>
+
+            </li>
+        </ul>
+    </div>
+
+</body>
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+<script>
+
+    //数据常驻
+    let toDoList = window.localStorage.getItem("toDoList")
+    if(toDoList){
+        toDoList = JSON.parse(toDoList);
+
+    }else{
+        toDoList= [{
+                    name: '买菜',
+                    isDone: false
+                },
+                {
+                    name: '洗菜',
+                    isDone: false
+                },
+                {
+                    name: '切菜',
+                    isDone: false
+                },
+                {
+                    name: '烧菜',
+                    isDone: false
+                }
+            ]
+    }
+    //这个是声明的全局函数;
+    function saveData(){
+        window.localStorage.setItem("toDoList",JSON.stringify(toDoList))
+        //注意这是引入类型的数据,存在栈里面,很多存的是链接
+        window.localStorage.setItem("toDoList",JSON.stringify(app.list))
+    }
+    let app = new Vue({
+        el: ".vue",
+        data: {
+            something: "",
+            list:toDoList
+        },
+        methods: {
+            handle() {
+                //console.log("我被点击啦");
+
+                this.list.push({
+                    name: this.something,
+                    isDone: false
+                });
+                saveData()
+
+            },
+            doThis(index){
+               this.list[index].isDone=!this.list[index].isDone;
+               saveData();
+            },
+            remove(index){
+                this.list.splice(index,1);
+                saveData();
+            }
+
+        },
+        computed:{
+            hasDone(){
+                let count = 0;
+                for(let i=0;i<this.list.length;i++){
+                    if(this.list[i].isDone){
+                        count++;
+                    }
+                }
+                return count;
+            }
+        }
+
+    })
+</script>
